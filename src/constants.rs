@@ -1,0 +1,1 @@
+pub const PIXELS_PER_METERS:f32 = 100.0;
