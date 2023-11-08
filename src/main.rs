@@ -16,7 +16,7 @@ fn main() {
         .add_systems(Startup,spawn_camera)
         .add_systems(Startup,spawn_player)
         .add_systems(Update,player_input)
-        .add_systems(Update,print_skills)
+        .add_systems(Update,ability_system)
         .run();
 }
 
