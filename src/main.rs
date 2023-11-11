@@ -7,6 +7,7 @@ pub mod constants;
 
 use systems::*;
 use player::systems::*;
+// use crate::player::skills::Skill;
 
 fn main() {
     App::new()
@@ -17,6 +18,7 @@ fn main() {
         .add_systems(Startup,spawn_player)
         .add_systems(Update,player_input)
         .add_systems(Update,ability_system)
+        .add_systems(Update,swap_ability)
         .run();
 }
 
