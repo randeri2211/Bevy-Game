@@ -1,20 +1,9 @@
-use crate::constants::*;
 use bevy::prelude::*;
 use std::time::Duration;
 use bevy::math::*;
 use bevy_rapier2d::prelude::*;
 use crate::constants::*;
-
-pub const SKILL_CD: f32 = 1.0;
-pub const SKILL_SPEED: f32 = 2.0;
-
-// #[bevy_trait_query::queryable]
-// pub trait Shootable{
-//     fn shoot(&self, commands: Commands, player_position: Vec3, mouse_position: Vec2);
-//     fn tick(&mut self,time:f32);
-//     fn reset(&mut self);
-//     fn finish(&self) -> bool;
-// }
+use crate::skills::skill_proj::*;
 
 #[derive(Component)]
 
@@ -30,11 +19,10 @@ pub struct SkillBase{
     pub(crate) speed:f32,
     pub(crate) active:bool,
     pub(crate) key:char,
-    pub(crate) shoot:fn(Commands,Vec3,Vec2,&SkillBase)->(),
+    pub(crate) shoot:fn(Commands, Vec3, Vec2, &SkillBase) ->(),
 }
 
 impl Default for SkillBase{
-
     fn default() -> Self {
         SkillBase {lvl:1,
             exp:0.0,
@@ -54,6 +42,8 @@ pub fn default_shoot(mut commands: Commands, player_position: Vec3, mouse_positi
         .insert(RigidBody::Dynamic)
         .insert(GravityScale(0.0))
         .insert(Friction::coefficient(0.0))
+        .insert(ActiveEvents::COLLISION_EVENTS)
+        // .insert(ActiveEvents::CONTACT_FORCE_EVENTS)
         .insert(SkillProj::initiate(player_position, mouse_position, skill.speed))
     ;
 }
@@ -68,37 +58,8 @@ pub fn reverse(mut commands: Commands, player_position: Vec3, mouse_position: Ve
         .insert(RigidBody::Dynamic)
         .insert(GravityScale(0.0))
         .insert(Friction::coefficient(0.0))
+        .insert(ActiveEvents::COLLISION_EVENTS)
+        // .insert(ActiveEvents::CONTACT_FORCE_EVENTS)
         .insert(SkillProj::initiate(new_mouse_position, new_player_position, skill.speed))
     ;
-}
-
-
-#[derive(Component)]
-pub struct SkillProj {
-}
-
-
-impl SkillProj{
-    pub fn initiate(player_position: Vec3, mouse_position: Vec2,speed:f32) -> (SkillProj, TransformBundle,Velocity) {
-        // Mouse position already fixed for the y orientation
-        (
-            SkillProj {},
-            TransformBundle::from_transform(Transform {
-                translation: player_position,
-                scale: Vec3::new(PIXELS_PER_METERS, PIXELS_PER_METERS, 0.0),
-                ..default()
-            }),
-            Velocity {
-                // Y position is reversed on mouse position(top is 0) from transform(bottom is 0)
-                linvel: Vec2::new(
-                    mouse_position.x - player_position.x,
-                    mouse_position.y - player_position.y,
-                )
-                .normalize()
-                    * speed
-                    * PIXELS_PER_METERS,
-                angvel: 0.0,
-            },
-        )
-    }
 }

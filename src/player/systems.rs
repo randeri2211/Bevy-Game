@@ -1,30 +1,15 @@
+use std::time::Duration;
 use crate::constants::*;
 use crate::player::components::*;
-use crate::player::skills::*;
+use crate::skills::skills::*;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 
 
-pub const PLAYER_RADIUS: f32 = 0.5;
-pub const PLAYER_JUMP: f32 = 100.0;
-pub const PLAYER_MAX_SPEED: f32 = 100.0;
-pub const PLAYER_ACCELERATION: f32 = 100.0;
-pub const PLAYER_MASS: f32 = 100.0;
+pub fn spawn_player(mut commands: Commands) {
 
-pub fn spawn_player(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
-    let window = window_query.get_single().unwrap();
-
-    // Ground
-    commands
-        .spawn(Collider::cuboid(5.0, 1.0))
-        .insert(TransformBundle::from_transform(Transform {
-            translation: Vec3::new(window.width() / 2.0, 0.0, 0.0),
-            scale: Vec3::new(PIXELS_PER_METERS, PIXELS_PER_METERS, 1.0),
-            ..default()
-        }));
-
-
+    // Skills init
     let mut player_skills:Vec<SkillBase> = Vec::new();
     player_skills.insert(0, SkillBase::default());
 
@@ -33,38 +18,31 @@ pub fn spawn_player(mut commands: Commands, window_query: Query<&Window, With<Pr
     another_skill.active = false;
     player_skills.insert(0, another_skill);
 
-    // Player
+    // Player init
     commands
         .spawn(RigidBody::Dynamic)
-        //.insert(Collider::ball(PLAYER_RADIUS))
-        .insert(Collider::capsule_y(PLAYER_RADIUS, PLAYER_RADIUS))
-
+        .insert(Collider::capsule_y(TILE_SIZE / 2.0, TILE_SIZE / 2.0))
         .insert(TransformBundle::from_transform(Transform {
-            translation: Vec3::new(window.width() / 2.0, window.height() / 2.0, 0.0),
+            translation: Vec3::new(0.0, TILE_SIZE * PIXELS_PER_METERS, 0.0),
             scale: Vec3::new(PIXELS_PER_METERS, PIXELS_PER_METERS, 1.0),
             ..default()
         }))
         .insert(Restitution::coefficient(0.0))
         .insert(Velocity {
-            linvel: Vec2::new(0.0 * PIXELS_PER_METERS, 0.0),
+            linvel: Vec2::new(0.0 , 0.0),
             angvel: 0.0,
         })
-        // .insert(ColliderMassProperties::Mass(PLAYER_MASS))
         .insert(Friction {
             coefficient: 0.0,
             combine_rule: CoefficientCombineRule::Min,
         })
+        // .insert(GravityScale{ 0: 0.0 })
         .insert(LockedAxes::ROTATION_LOCKED)
         .insert(Player { ..default() })
-
         .insert(Skills { skills_vec: player_skills });
 }
 
-pub fn player_input(
-    keys: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Player), With<Player>>,
-    time: Res<Time>,
-) {
+pub fn player_input(keys: Res<Input<KeyCode>>, mut query: Query<(&mut Velocity, &mut Player), With<Player>>, time: Res<Time>,) {
   
     let (mut velocity, mut player) = query.get_single_mut().unwrap().into();
     let mut x_pressed = false;
@@ -108,34 +86,31 @@ pub fn player_input(
     }
 }
 
-pub fn ability_system(
-    buttons: Res<Input<MouseButton>>,
-    mut q_windows: Query<&Window, With<PrimaryWindow>>,
-    mut query: Query<&Transform, With<Player>>,
-    commands: Commands,
-    time: Res<Time>,
-    mut s_query: Query<&mut Skills, With<Player>>,
-) {
+pub fn ability_system(buttons: Res<Input<MouseButton>>, commands: Commands, time: Res<Time>, mut q_windows: Query<&Window, With<PrimaryWindow>>, mut query: Query<&Transform, With<Player>>, mut s_query: Query<&mut Skills, With<Player>>,c_query: Query<(&Camera, &GlobalTransform)>) {
+
     let window = q_windows.get_single_mut().unwrap();
 
     let transform = query.get_single_mut().unwrap();
 
     let mut skills = s_query.get_single_mut().unwrap();
 
-    if buttons.pressed(MouseButton::Left) {
-        // a whole loop just to tick all the skills
-        for skill in skills.skills_vec.iter_mut() {
-            skill.cd.tick(Duration::from_secs_f32(time.delta_seconds()));
-        }
+    let (camera, camera_transform) = c_query.single();
+    // println!("{}",transform.translation);
 
+    // a whole loop just to tick all the skills
+    for skill in skills.skills_vec.iter_mut() {
+        skill.cd.tick(Duration::from_secs_f32(time.delta_seconds()));
+    }
+
+    if buttons.pressed(MouseButton::Left) {
         // a separate loop for procing the active skill
         for skill in skills.skills_vec.iter_mut() {
             if skill.active {
                 if skill.cd.finished() {
                     skill.cd.reset();
-                    if let Some(mut mouse_position) = window.cursor_position() {
+                    if let Some(mut mouse_position) = window.cursor_position().and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+                        .map(|ray| ray.origin.truncate()) {
                         println!("shooting");
-                        mouse_position.y = window.height() - mouse_position.y;
                         (skill.shoot)(commands, transform.translation, mouse_position, skill);
                         break;
                     }
@@ -145,10 +120,7 @@ pub fn ability_system(
     }
 }
 
-pub fn swap_ability(
-    buttons: Res<Input<MouseButton>>,
-    mut s_query: Query<&mut Skills, With<Player>>,
-) {
+pub fn swap_ability(buttons: Res<Input<MouseButton>>, mut s_query: Query<&mut Skills, With<Player>>,) {
     if buttons.just_pressed(MouseButton::Right) {
         println!("swapped");
         let mut found = false;
