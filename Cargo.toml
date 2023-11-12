@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.11.3"
+bevy-trait-query = "0.3.0"
 bevy_rapier2d = "0.22.0"
