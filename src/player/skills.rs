@@ -1,11 +1,12 @@
+use crate::constants::*;
 use bevy::prelude::*;
 use std::time::Duration;
 use bevy::math::*;
 use bevy_rapier2d::prelude::*;
 use crate::constants::*;
 
-pub const SKILL_CD:f32 = 1.0;
-pub const SKILL_SPEED:f32 = 2.0;
+pub const SKILL_CD: f32 = 1.0;
+pub const SKILL_SPEED: f32 = 2.0;
 
 // #[bevy_trait_query::queryable]
 // pub trait Shootable{
@@ -16,6 +17,7 @@ pub const SKILL_SPEED:f32 = 2.0;
 // }
 
 #[derive(Component)]
+
 pub struct Skills{
     pub(crate) skills_vec:Vec<SkillBase>
 }
@@ -75,22 +77,28 @@ pub fn reverse(mut commands: Commands, player_position: Vec3, mouse_position: Ve
 pub struct SkillProj {
 }
 
+
 impl SkillProj{
     pub fn initiate(player_position: Vec3, mouse_position: Vec2,speed:f32) -> (SkillProj, TransformBundle,Velocity) {
         // Mouse position already fixed for the y orientation
-        (SkillProj{
-
-        },
-         TransformBundle::from_transform(Transform{
-             translation: player_position,
-             scale:Vec3::new(PIXELS_PER_METERS,PIXELS_PER_METERS,0.0),
-             ..default()
-         }),
-         Velocity {
-             // Y position is reversed on mouse position(top is 0) from transform(bottom is 0)
-             linvel: Vec2::new(mouse_position.x - player_position.x, mouse_position.y - player_position.y).normalize()*speed*PIXELS_PER_METERS,
-             angvel: 0.0,
-         }
+        (
+            SkillProj {},
+            TransformBundle::from_transform(Transform {
+                translation: player_position,
+                scale: Vec3::new(PIXELS_PER_METERS, PIXELS_PER_METERS, 0.0),
+                ..default()
+            }),
+            Velocity {
+                // Y position is reversed on mouse position(top is 0) from transform(bottom is 0)
+                linvel: Vec2::new(
+                    mouse_position.x - player_position.x,
+                    mouse_position.y - player_position.y,
+                )
+                .normalize()
+                    * speed
+                    * PIXELS_PER_METERS,
+                angvel: 0.0,
+            },
         )
     }
 }

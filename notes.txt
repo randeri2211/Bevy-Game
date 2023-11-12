@@ -12,6 +12,6 @@ upgrade magic
 
 
 Going to involve:
-Physics-Gravity,Colliders
+Physics-Gravity,Colliders 2705
 Map(How?)
 Terrain generation,Terrain Display,Chunks(?),Terrain Modification(build/destroy)

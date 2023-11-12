@@ -4,7 +4,7 @@ use crate::player::skills::*;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
-use std::time::Duration;
+
 
 pub const PLAYER_RADIUS: f32 = 0.5;
 pub const PLAYER_JUMP: f32 = 100.0;
@@ -24,6 +24,7 @@ pub fn spawn_player(mut commands: Commands, window_query: Query<&Window, With<Pr
             ..default()
         }));
 
+
     let mut player_skills:Vec<SkillBase> = Vec::new();
     player_skills.insert(0, SkillBase::default());
 
@@ -35,7 +36,9 @@ pub fn spawn_player(mut commands: Commands, window_query: Query<&Window, With<Pr
     // Player
     commands
         .spawn(RigidBody::Dynamic)
-        .insert(Collider::ball(PLAYER_RADIUS))
+        //.insert(Collider::ball(PLAYER_RADIUS))
+        .insert(Collider::capsule_y(PLAYER_RADIUS, PLAYER_RADIUS))
+
         .insert(TransformBundle::from_transform(Transform {
             translation: Vec3::new(window.width() / 2.0, window.height() / 2.0, 0.0),
             scale: Vec3::new(PIXELS_PER_METERS, PIXELS_PER_METERS, 1.0),
@@ -53,6 +56,7 @@ pub fn spawn_player(mut commands: Commands, window_query: Query<&Window, With<Pr
         })
         .insert(LockedAxes::ROTATION_LOCKED)
         .insert(Player { ..default() })
+
         .insert(Skills { skills_vec: player_skills });
 }
 
@@ -61,6 +65,7 @@ pub fn player_input(
     mut query: Query<(&mut Velocity, &mut Player), With<Player>>,
     time: Res<Time>,
 ) {
+  
     let (mut velocity, mut player) = query.get_single_mut().unwrap().into();
     let mut x_pressed = false;
 
