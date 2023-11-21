@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::math::*;
 use bevy_rapier2d::prelude::*;
 use crate::constants::*;
-use crate::skills::skill_proj::*;
+use crate::game::skills::skill_proj::*;
 
 #[derive(Component)]
 
@@ -19,7 +19,7 @@ pub struct SkillBase{
     pub(crate) speed:f32,
     pub(crate) active:bool,
     pub(crate) key:char,
-    pub(crate) shoot:fn(Commands, Vec3, Vec2, &SkillBase) ->(),
+    pub(crate) shoot:fn(Commands, Vec3, Vec2, &SkillBase,u32,u32) ->(),
 }
 
 impl Default for SkillBase{
@@ -36,19 +36,18 @@ impl Default for SkillBase{
     }
 }
 
-pub fn default_shoot(mut commands: Commands, player_position: Vec3, mouse_position: Vec2, skill:&SkillBase) {
+pub fn default_shoot(mut commands: Commands, player_position: Vec3, mouse_position: Vec2, skill:&SkillBase,entity_id:u32,entity_gen:u32) {
     commands.spawn(Collider::ball(skill.size))
         .insert(Sensor)
         .insert(RigidBody::Dynamic)
         .insert(GravityScale(0.0))
         .insert(Friction::coefficient(0.0))
         .insert(ActiveEvents::COLLISION_EVENTS)
-        // .insert(ActiveEvents::CONTACT_FORCE_EVENTS)
-        .insert(SkillProj::initiate(player_position, mouse_position, skill.speed))
+        .insert(SkillProj::initiate(player_position, mouse_position, skill.speed,entity_id,entity_gen))
     ;
 }
 
-pub fn reverse(mut commands: Commands, player_position: Vec3, mouse_position: Vec2,skill:&SkillBase) {
+pub fn reverse(mut commands: Commands, player_position: Vec3, mouse_position: Vec2,skill:&SkillBase,entity_id:u32,entity_gen:u32) {
 
     let new_mouse_position = vec3(mouse_position.x,mouse_position.y,0.0);
     let new_player_position = vec2(player_position.x,player_position.y);
@@ -59,7 +58,6 @@ pub fn reverse(mut commands: Commands, player_position: Vec3, mouse_position: Ve
         .insert(GravityScale(0.0))
         .insert(Friction::coefficient(0.0))
         .insert(ActiveEvents::COLLISION_EVENTS)
-        // .insert(ActiveEvents::CONTACT_FORCE_EVENTS)
-        .insert(SkillProj::initiate(new_mouse_position, new_player_position, skill.speed))
+        .insert(SkillProj::initiate(new_mouse_position, new_player_position, skill.speed,entity_id,entity_gen))
     ;
 }

@@ -1,10 +1,5 @@
 use bevy::prelude::*;
 
-#[derive(Resource)]
-pub struct Mapp {
-    pub(crate) tiles:Vec<Vec<Entity>>
-}
-
 
 #[derive(Component)]
 pub struct Tile {

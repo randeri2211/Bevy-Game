@@ -4,14 +4,24 @@ use bevy_rapier2d::prelude::*;
 use crate::constants::*;
 
 #[derive(Component)]
+pub struct SkillProjBase {
+    pub(crate) id:u32,
+    pub(crate) generation:u32,
+}
+
+#[derive(Component)]
 pub struct SkillProj {
 }
 
 impl SkillProj{
-    pub fn initiate(player_position: Vec3, mouse_position: Vec2,speed:f32) -> (SkillProj, TransformBundle,Velocity) {
+    pub fn initiate(player_position: Vec3, mouse_position: Vec2,speed:f32,entity_id:u32,entity_gen:u32) -> (SkillProj,SkillProjBase, TransformBundle,Velocity) {
         // Mouse position already fixed for the y orientation
         (
             SkillProj {},
+            SkillProjBase{
+                id: entity_id,
+                generation:entity_gen
+            },
             TransformBundle::from_transform(Transform {
                 translation: player_position,
                 scale: Vec3::new(PIXELS_PER_METERS, PIXELS_PER_METERS, 0.0),

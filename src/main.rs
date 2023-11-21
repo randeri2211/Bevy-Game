@@ -3,32 +3,35 @@ use bevy_rapier2d::prelude::*;
 
 pub mod constants;
 pub mod systems;
-mod player;
-mod map;
-mod skills;
 
-use map::systems::*;
-use player::systems::*;
-use systems::*;
+mod game;
+
+
+use crate::systems::*;
 use crate::constants::*;
-use crate::map::components::*;
+use crate::game::GamePlugin;
 
 
 fn main() {
     App::new()
+        .add_state::<AppState>()
+        // Given Plugins
         .add_plugins(DefaultPlugins)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METERS))
         .add_plugins(RapierDebugRenderPlugin::default())
-        .add_systems(Startup,load_map)
+        // Player Plugin
+        .add_plugins(GamePlugin{})
+        // Systems
         .add_systems(Startup,spawn_camera)
-        .add_systems(Startup,spawn_player)
-        .add_systems(Update,cam_follow_player)
-        .add_systems(Update,player_input)
-        .add_systems(Update,ability_system)
-        .add_systems(Update,swap_ability)
-        .add_systems(Update,display_events)
-        .insert_resource(Mapp {
-            tiles: Vec::new(),
-        })
+        .add_systems(Update, block_collisions_handler)
+        .add_systems(Update,entity_collisions_handler)
+        .add_systems(Update, toggle_app_state)
         .run();
+}
+
+#[derive(States, Debug, Eq, PartialEq, Clone, Copy, Hash, Default)]
+pub enum AppState {
+    #[default]
+    MainMenu,
+    Game,
 }
