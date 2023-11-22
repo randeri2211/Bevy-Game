@@ -18,7 +18,6 @@ pub fn spawn_camera(mut commands: Commands) {
 
 pub fn block_collisions_handler(
     mut collision_events: EventReader<CollisionEvent>,
-    mut contact_force_events: EventReader<ContactForceEvent>,
     tile_query: Query<Entity,With<Tile>>,
     mut commands: Commands
 ) {
@@ -32,16 +31,14 @@ pub fn block_collisions_handler(
                     // Order of entities is not obsolete, check if one of the entities is a tile
                     if tile == *entity1{
                         if !hit_this_frame.contains(entity2) {
-                            println!("normal");
                             commands.get_entity(*entity2).unwrap().despawn();
                             commands.get_entity(*entity1).unwrap().remove::<Mesh2dHandle>().remove::<Collider>();
                             hit_this_frame.insert(0,*entity2);
                         }
                         break;
                     }
-                    if tile == *entity2{
+                    else if tile == *entity2{
                         if !hit_this_frame.contains(entity1){
-                            println!("reversed");
                             commands.get_entity(*entity1).unwrap().despawn();
                             commands.get_entity(*entity2).unwrap().remove::<Mesh2dHandle>().remove::<Collider>();
                             hit_this_frame.insert(0,*entity1);
@@ -54,13 +51,6 @@ pub fn block_collisions_handler(
             CollisionEvent::Stopped(_, _, _) => {},
             _ => {}
         };
-    }
-
-    //mainly for debug purposes
-    //TODO:remove
-    for contact_force_event in contact_force_events.read() {
-
-        println!("Received contact force event: {:?}", contact_force_event);
     }
 }
 
@@ -81,7 +71,6 @@ pub fn entity_collisions_handler(
 
 
     for collision_event in collision_events.read() {
-        println!("{:?}",collision_event);
         match collision_event {
             CollisionEvent::Started(entity1, entity2, CollisionEventFlags::SENSOR) =>
                 {

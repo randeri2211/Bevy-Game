@@ -7,7 +7,7 @@ __Genre__:
 
 
 __Ideas__:
-- [ ] inherent magic and lvl system
+- [x] inherent magic and lvl system
 - [ ] lore
 - [ ] magic alteration in some form
 - [ ] 2D game terraria-style voxel style
