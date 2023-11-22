@@ -4,7 +4,7 @@ use bevy::math::f32;
 pub const PIXELS_PER_METERS: f32 = 100.0;
 pub const TILE_SIZE:f32 = 1.0/2.0; //Meters
 pub const TILES:f32 = 4.0;
-
+pub const NORMAL_FRICTION:f32 = 0.5;
 
 // Skill constants
 pub const SKILL_CD: f32 = 1.0;
