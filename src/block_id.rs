@@ -35,12 +35,12 @@ fn grass(
     let mesh_handle: Mesh2dHandle = meshes.add(mesh).into();
 
     commands
-        // .insert(RigidBody::Fixed)
         .spawn(MaterialMesh2dBundle {
             mesh: mesh_handle,
             material: materials.add(ColorMaterial::from(texture_handle)),
             ..default()
         })
+        .insert(RigidBody::Fixed)
         .insert( BlockBundle{
             tile: Tile {
                 id: 0,
@@ -75,7 +75,7 @@ fn rock(
         material: materials.add(ColorMaterial::from(texture_handle)),
         ..default()
     })
-        // .insert(RigidBody::Fixed)
+        .insert(RigidBody::Fixed)
         .insert( BlockBundle{
             tile: Tile {
                 id: 1,
@@ -113,7 +113,7 @@ fn interact(
         material: materials.add(ColorMaterial::from(texture_handle)),
         ..default()
     })
-        // .insert(RigidBody::Fixed)
+        .insert(RigidBody::Fixed)
         .insert( BlockBundle{
             tile:Tile {
                 id: 2,

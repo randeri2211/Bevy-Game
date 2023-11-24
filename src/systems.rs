@@ -1,8 +1,10 @@
+use std::cmp::min;
 use bevy::prelude::*;
 use bevy::sprite::Mesh2dHandle;
 use bevy_rapier2d::prelude::*;
 use bevy_rapier2d::rapier::prelude::CollisionEventFlags;
 use crate::AppState;
+use crate::game::entities::components::ManaBar;
 use crate::game::map::components::*;
 use crate::game::skills::skill_proj::*;
 
@@ -108,5 +110,11 @@ pub fn toggle_app_state(
             commands.insert_resource(NextState(Some(AppState::Game)));
             println!("in game");
         }
+    }
+}
+
+pub fn mana_regen(mut mages:Query<&mut ManaBar>,time:Res<Time>){
+    for mut mage in mages.iter_mut(){
+        mage.current_mana = f32::min(mage.current_mana + mage.mana_regen*time.delta_seconds(),mage.max_mana);
     }
 }

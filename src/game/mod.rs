@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use crate::game::map::MapPlugin;
-use crate::game::player::PlayerPlugin;
+use crate::game::entities::player::PlayerPlugin;
 
-pub mod player;
 pub mod map;
 pub mod skills;
+pub mod entities;
 
 pub struct GamePlugin{}
 

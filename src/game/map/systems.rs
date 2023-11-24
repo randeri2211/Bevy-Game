@@ -3,7 +3,8 @@ use bevy::{prelude::*};
 use bevy_rapier2d::prelude::*;
 use crate::block_id::BLOCK_IDS;
 use crate::constants::*;
-use crate::game::player::components::*;
+use crate::game::entities::components::*;
+use crate::game::entities::player::components::*;
 use crate::game::skills::skills::*;
 
 
@@ -79,7 +80,7 @@ pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3) {
     // Player init
     commands
         .spawn(RigidBody::Dynamic)
-        .insert(Collider::capsule_y(TILE_SIZE, TILE_SIZE))
+        .insert(Collider::capsule_y(TILE_SIZE,TILE_SIZE))
         .insert(TransformBundle::from_transform(Transform {
             translation: translation_vec,
             scale: Vec3::splat(PIXELS_PER_METERS / 2.0),
@@ -94,9 +95,22 @@ pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3) {
             coefficient: 1.0,
             combine_rule: CoefficientCombineRule::Multiply,
         })
-        // .insert(GravityScale{ 0: 0.0 })
+        .insert(GravityScale{ 0: 2.0 })
         .insert(LockedAxes::ROTATION_LOCKED)
+        // Player Related //
         .insert(Player { ..default() })
         .insert(Skills { skills_vec: player_skills })
+        .insert(MageBundle{
+            health: HealthBar{
+                max_health: 100.0,
+                current_health: 100.0,
+                health_regen: 1.0,
+            },
+            mana: ManaBar{
+                max_mana: 100.0,
+                current_mana: 100.0,
+                mana_regen: 10.0,
+            }
+        })
     ;
 }
