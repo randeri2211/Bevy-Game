@@ -10,3 +10,4 @@ impl Default for Player {
         Player { last_speed: 0.0 }
     }
 }
+

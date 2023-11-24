@@ -1,4 +1,3 @@
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -23,8 +22,9 @@ fn main() {
         .add_plugins(RapierDebugRenderPlugin::default())
         // Player Plugin
         .add_plugins(GamePlugin{})
-        .add_plugins(LogDiagnosticsPlugin::default())
-        .add_plugins(FrameTimeDiagnosticsPlugin::default())
+        // FPS Counter Plugins
+        // .add_plugins(LogDiagnosticsPlugin::default())
+        // .add_plugins(FrameTimeDiagnosticsPlugin::default())
         // Systems
         .add_systems(Startup,spawn_camera)
         .add_systems(Update, block_collisions_handler)

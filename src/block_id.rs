@@ -9,36 +9,9 @@ struct BlockBundle{
     tile: Tile,
     collider: Collider,
     friction: Friction,
-    global:GlobalTransform,
+    transform: TransformBundle,
 }
 
-
-pub const ASSETS: &str = "assets/";
-
-
-
-
-// pub const BLOCK_IDS: &[BlockBundle; 3] = &[
-//     BlockBundle{
-//         tile: Tile { id: 1 },
-//         collider: Collider::cuboid(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
-//         friction: Friction{ coefficient: 0.2, combine_rule: CoefficientCombineRule::Multiply },
-//         global: GlobalTransform::IDENTITY,
-//     },
-//     BlockBundle{
-//         tile: Tile { id: 2 },
-//         collider: Collider::cuboid(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
-//         friction: Friction{ coefficient: 1.0, combine_rule: CoefficientCombineRule::Multiply },
-//         global: GlobalTransform::IDENTITY,
-//     },
-//     BlockBundle{
-//         tile: Tile { id: 3 },
-//         collider: Collider::cuboid(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
-//         friction: Friction{ coefficient: 10.0, combine_rule: CoefficientCombineRule::Multiply },
-//         global: GlobalTransform::IDENTITY,
-//     },
-//
-// ];
 pub const BLOCK_IDS: [fn(&mut Commands, Vec3, asset_server: &Res<AssetServer>,&mut ResMut<Assets<Mesh>>, &mut ResMut<Assets<ColorMaterial>>)->();
     4] = [
     rock,
@@ -46,6 +19,8 @@ pub const BLOCK_IDS: [fn(&mut Commands, Vec3, asset_server: &Res<AssetServer>,&m
     interact,
     grass
 ];
+
+
 
 fn grass(
     commands: &mut Commands,
@@ -59,23 +34,26 @@ fn grass(
     let mesh = Mesh::from(shape::Quad::default());
     let mesh_handle: Mesh2dHandle = meshes.add(mesh).into();
 
-    commands.spawn(Collider::cuboid(TILE_SIZE, TILE_SIZE))
+    commands
         // .insert(RigidBody::Fixed)
-        .insert(Tile {
-            id: 1,
-        })
-        .insert(MaterialMesh2dBundle {
+        .spawn(MaterialMesh2dBundle {
             mesh: mesh_handle,
             material: materials.add(ColorMaterial::from(texture_handle)),
             ..default()
         })
-        .insert(TransformBundle::from_transform(Transform {
-            translation: position,
-            scale: Vec3::splat(PIXELS_PER_METERS/2.0),
-            ..default()
-        }))
+        .insert( BlockBundle{
+            tile: Tile {
+                id: 0,
+            },
+            collider: Collider::cuboid(TILE_SIZE, TILE_SIZE),
+            friction: Friction{ coefficient: NORMAL_FRICTION, combine_rule: CoefficientCombineRule::Multiply },
+            transform: TransformBundle::from_transform(Transform {
+                translation: position,
+                scale: Vec3::splat(PIXELS_PER_METERS/2.0),
+                ..default()
+            }),
+        })
         .insert(ActiveCollisionTypes::all())
-        .insert(Friction{ coefficient: NORMAL_FRICTION, combine_rule: CoefficientCombineRule::Multiply })
         .insert(ActiveEvents::COLLISION_EVENTS)
     ;
 }
@@ -92,23 +70,26 @@ fn rock(
     let mesh = Mesh::from(shape::Quad::default());
     let mesh_handle: Mesh2dHandle = meshes.add(mesh).into();
 
-    commands.spawn(Collider::cuboid(TILE_SIZE, TILE_SIZE))
+    commands.spawn(MaterialMesh2dBundle {
+        mesh: mesh_handle,
+        material: materials.add(ColorMaterial::from(texture_handle)),
+        ..default()
+    })
         // .insert(RigidBody::Fixed)
-        .insert(Tile {
-            id: 1,
+        .insert( BlockBundle{
+            tile: Tile {
+                id: 1,
+            },
+            collider: Collider::cuboid(TILE_SIZE, TILE_SIZE),
+            friction: Friction{ coefficient: NORMAL_FRICTION * 2.0, combine_rule: CoefficientCombineRule::Multiply },
+            transform: TransformBundle::from_transform(Transform {
+                translation: position,
+                scale: Vec3::splat(PIXELS_PER_METERS/2.0),
+                ..default()
+            }),
         })
-        .insert(MaterialMesh2dBundle {
-            mesh: mesh_handle,
-            material: materials.add(ColorMaterial::from(texture_handle)),
-            ..default()
-        })
-        .insert(TransformBundle::from_transform(Transform {
-            translation: position,
-            scale: Vec3::splat(PIXELS_PER_METERS/2.0),
-            ..default()
-        }))
+
         .insert(ActiveCollisionTypes::all())
-        .insert(Friction{ coefficient: 0.0, combine_rule: CoefficientCombineRule::Multiply })
         .insert(ActiveEvents::COLLISION_EVENTS)
     ;
 }
@@ -126,25 +107,27 @@ fn interact(
 
     let mesh_handle: Mesh2dHandle = meshes.add(mesh).into();
 
-    commands.spawn(Collider::cuboid(TILE_SIZE, TILE_SIZE))
-        // .insert(RigidBody::Fixed)
-        .insert(Tile {
-            id: 1,
-        })
-        .insert(MaterialMesh2dBundle {
-            mesh: mesh_handle,
-            material: materials.add(ColorMaterial::from(texture_handle)),
-            ..default()
-        })
-        .insert(TransformBundle::from_transform(Transform {
-            translation: Vec3::new(position.x,position.y - PIXELS_PER_METERS * TILE_SIZE / 4.0,position.z),
-            scale: Vec3::new(PIXELS_PER_METERS/2.0,PIXELS_PER_METERS/4.0,1.0),
-            ..default()
-        }))
-        .insert(ActiveCollisionTypes::all())
-        .insert(Friction{ coefficient: 0.0, combine_rule: CoefficientCombineRule::Multiply })
-        .insert(Interactable{ has_inventory: true })
-        .insert(ActiveEvents::COLLISION_EVENTS)
 
+    commands.spawn(MaterialMesh2dBundle {
+        mesh: mesh_handle,
+        material: materials.add(ColorMaterial::from(texture_handle)),
+        ..default()
+    })
+        // .insert(RigidBody::Fixed)
+        .insert( BlockBundle{
+            tile:Tile {
+                id: 2,
+            },
+            collider:Collider::cuboid(TILE_SIZE, TILE_SIZE),
+            friction: Friction{ coefficient: NORMAL_FRICTION, combine_rule: CoefficientCombineRule::Multiply },
+            transform: TransformBundle::from_transform(Transform {
+                translation: Vec3::new(position.x,position.y - PIXELS_PER_METERS * TILE_SIZE / 4.0,position.z),
+                scale: Vec3::new(PIXELS_PER_METERS/2.0,PIXELS_PER_METERS/4.0,1.0),
+                ..default()
+            }),
+        })
+
+        .insert(ActiveCollisionTypes::all())
+        .insert(ActiveEvents::COLLISION_EVENTS)
     ;
 }

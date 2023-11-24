@@ -13,15 +13,26 @@ pub fn load_map(
     mut materials: ResMut<Assets<ColorMaterial>>,
     asset_server: Res<AssetServer>
 ){
-
     let contents = fs::read_to_string("World/map.txt")
         .expect("cant read the map");
 
 
-    let mut row:usize = 0;
-
+    let mut start_x = 0;
+    let mut start_y = 0;
     for line in contents.lines(){
-        let mut col:usize = 0;
+        start_x = 0;
+        for _ in line.chars(){
+            start_x += 1;
+        }
+        start_y += 1;
+    }
+
+    start_x = - start_x / 2;
+    start_y = - start_y / 2;
+
+    let mut row = -start_y;
+    for line in contents.lines(){
+        let mut col = start_x;
 
         for tile in line.chars(){
             let position_x = -TILES / 2.0 + col as f32 * TILE_SIZE * PIXELS_PER_METERS;
