@@ -13,7 +13,8 @@ impl Plugin for GamePlugin{
         app
             .add_state::<GameState>()
             .add_plugins(MapPlugin{})
-            .add_plugins(PlayerPlugin{});
+            .add_plugins(PlayerPlugin{})
+        ;
     }
 }
 

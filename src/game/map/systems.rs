@@ -95,7 +95,7 @@ pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3) {
             coefficient: 1.0,
             combine_rule: CoefficientCombineRule::Multiply,
         })
-        .insert(GravityScale{ 0: 2.0 })
+        .insert(GravityScale{ 0: 1.0 })
         .insert(LockedAxes::ROTATION_LOCKED)
         // Player Related //
         .insert(Player { ..default() })

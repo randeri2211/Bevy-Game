@@ -77,49 +77,49 @@ pub fn player_input(
                         }
 
 
-                        // else if *entity2 == player_entity{
-                        //     for (collider_transform,collider,entity) in tile_collider_query.iter(){
-                        //         if *entity1 == entity{
-                        //             let p_collider = player_collider.as_capsule().unwrap();
-                        //
-                        //             let mut continue_top = true;
-                        //             let mut temp_c_trans = collider_transform.clone();
-                        //             let mut temp_collider = collider.clone();
-                        //
-                        //             // Finding the top block in the chain to see if its still stepable
-                        //             while continue_top{
-                        //                 continue_top = false;
-                        //                 for (collider_transform2,collider2,_) in tile_collider_query.iter(){
-                        //                     if (collider_transform2.translation.x - temp_c_trans.translation.x).abs() <=  offset
-                        //                     // && (collider_transform2.translation.x - player_transform.translation.x).abs() <= TILE_SIZE * PIXELS_PER_METERS + offset
-                        //                     {
-                        //                         if collider_transform2.translation.y - temp_c_trans.translation.y >= TILE_SIZE * PIXELS_PER_METERS - offset
-                        //                             && collider_transform2.translation.y - temp_c_trans.translation.y <= TILE_SIZE * PIXELS_PER_METERS + offset{
-                        //                             // Found block above the current block in the chain,need to continue climbing
-                        //                             continue_top = true;
-                        //
-                        //                             temp_c_trans = collider_transform2.clone();
-                        //                             temp_collider = collider2.clone();
-                        //
-                        //                             break;
-                        //                         }
-                        //                     }
-                        //                 }
-                        //             }
-                        //
-                        //
-                        //
-                        //             let half_cuboid = temp_collider.as_cuboid().unwrap().half_extents().y;
-                        //
-                        //             if player_transform.translation.y >= temp_c_trans.translation.y + half_cuboid - offset{
-                        //                 player_transform.translation = Vec3::new(player_transform.translation.x,
-                        //                                                          half_cuboid + temp_c_trans.translation.y + p_collider.half_height() + p_collider.radius(),
-                        //                                                          player_transform.translation.z
-                        //                 );
-                        //             }
-                        //         }
-                        //     }
-                        // }
+                        else if *entity2 == player_entity{
+                            for (collider_transform,collider,entity) in tile_collider_query.iter(){
+                                if *entity1 == entity{
+                                    let p_collider = player_collider.as_capsule().unwrap();
+
+
+                                    let mut continue_top = true;
+                                    let mut temp_c_trans = collider_transform.clone();
+                                    let mut temp_collider = collider.as_cuboid().unwrap().clone();
+
+                                    // Finding the top block in the chain to see if its still stepable
+                                    while continue_top{
+                                        continue_top = false;
+                                        for (collider_transform2,collider2,_) in tile_collider_query.iter(){
+                                            if (collider_transform2.translation.x - temp_c_trans.translation.x).abs() <=  offset
+                                            // && (collider_transform2.translation.x - player_transform.translation.x).abs() <= TILE_SIZE * PIXELS_PER_METERS + offset
+                                            {
+                                                let cuboid = collider2.as_cuboid().unwrap();
+                                                if collider_transform2.translation.y + cuboid.half_extents().y - (temp_c_trans.translation.y) >= TILE_SIZE * PIXELS_PER_METERS - offset
+                                                    && collider_transform2.translation.y - temp_c_trans.translation.y <= TILE_SIZE * PIXELS_PER_METERS + offset{
+                                                    // Found block above the current block in the chain,need to continue climbing
+                                                    continue_top = true;
+
+                                                    temp_c_trans = collider_transform2.clone();
+                                                    temp_collider = collider2.as_cuboid().unwrap().clone();
+
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    let half_cuboid = temp_collider.half_extents().y;
+
+                                    if player_transform.translation.y >= temp_c_trans.translation.y + half_cuboid - offset{
+                                        player_transform.translation = Vec3::new(player_transform.translation.x,
+                                                                                 half_cuboid + temp_c_trans.translation.y + p_collider.half_height() + p_collider.radius(),
+                                                                                 player_transform.translation.z
+                                        );
+                                    }
+                                }
+                            }
+                        }
 
                     }
                 ,

@@ -95,7 +95,7 @@ pub fn toggle_app_state(
     app_state: Res<State<AppState>>,
     entity_query: Query<Entity,With<Collider>>,
 ){
-    if keys.just_pressed(KeyCode::Escape){
+    if keys.just_pressed(KeyCode::G){
         if *app_state.get() == AppState::Game{
             commands.insert_resource(NextState(Some(AppState::MainMenu)));
             for entity in entity_query.iter(){
@@ -103,10 +103,7 @@ pub fn toggle_app_state(
             }
             println!("in mainmenu");
         }
-    }
-
-    if keys.just_pressed(KeyCode::Escape){
-        if *app_state.get() == AppState::MainMenu{
+        else if *app_state.get() == AppState::MainMenu{
             commands.insert_resource(NextState(Some(AppState::Game)));
             println!("in game");
         }
