@@ -19,6 +19,7 @@ pub struct SkillBase{
     pub(crate) speed:f32,
     pub(crate) active:bool,
     pub(crate) key:char,
+    pub(crate) mana_cost:f32,
     pub(crate) shoot:fn(Commands, Vec3, Vec2, &SkillBase,u32,u32) ->(),
 }
 
@@ -31,6 +32,7 @@ impl Default for SkillBase{
             speed: SKILL_SPEED,
             active: true,
             key: 'r',
+            mana_cost: 10.0,
             shoot: default_shoot,
         }
     }

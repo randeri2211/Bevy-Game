@@ -5,6 +5,7 @@ use crate::game::skills::skills::*;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
+use crate::game::entities::components::ManaBar;
 use crate::game::map::components::*;
 use crate::settings::components::Settings;
 
@@ -14,14 +15,14 @@ pub fn player_input(
     mut query: Query<(&mut Velocity, &mut Player,&mut Transform, &Collider,Entity,&mut Friction), With<Player>>,
     time: Res<Time>,
     mut collision_events: EventReader<CollisionEvent>,
-    tile_collider_query: Query<(&Transform,&Collider,Entity),(With<Tile>,Without<Player>)>,
+    tile_collider_query: Query<(&Transform,&Collider,Entity),(With<MyTile>, Without<Player>)>,
     settings: Res<Settings>
 ) {
     let (mut velocity, mut player, mut player_transform, player_collider,player_entity,mut friction) = query.get_single_mut().unwrap().into();
     let mut x_pressed = false;
 
     // Used to reduce code duplication,rust compiler just chains it down as raw code to reduce run time(i think)
-    fn check_auto_step(player_transform:&mut Transform, player_collider:&Collider, player_entity:Entity, collision_events: &mut EventReader<CollisionEvent>, tile_collider_query: &Query<(&Transform, &Collider, Entity),(With<Tile>, Without<Player>)>){
+    fn check_auto_step(player_transform:&mut Transform, player_collider:&Collider, player_entity:Entity, collision_events: &mut EventReader<CollisionEvent>, tile_collider_query: &Query<(&Transform, &Collider, Entity),(With<MyTile>, Without<Player>)>){
         // Check for auto-step
 
         for collision in collision_events.read(){
@@ -183,13 +184,13 @@ pub fn ability_system(
     commands: Commands,
     time: Res<Time>,
     mut q_windows: Query<&Window, With<PrimaryWindow>>,
-    mut p_query: Query<(&Transform, &mut Skills, Entity), With<Player>>,
+    mut p_query: Query<(&Transform, &mut Skills, Entity,&mut ManaBar), With<Player>>,
     c_query: Query<(&Camera, &GlobalTransform)>
 ) {
 
     let window = q_windows.get_single_mut().unwrap();
 
-    let (transform,mut skills,entity) = p_query.get_single_mut().unwrap();
+    let (transform,mut skills,entity,mut player_mana) = p_query.get_single_mut().unwrap();
 
 
     let (camera, camera_transform) = c_query.single();
@@ -207,10 +208,15 @@ pub fn ability_system(
                     skill.cd.reset();
                     if let Some(mouse_position) = window.cursor_position().and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
                         .map(|ray| ray.origin.truncate()) {
-                        (skill.shoot)(commands, transform.translation, mouse_position, skill,entity.index(),entity.generation());
-                        break;
+                        if player_mana.current_mana >= skill.mana_cost{
+                            (skill.shoot)(commands, transform.translation, mouse_position, skill,entity.index(),entity.generation());
+                            player_mana.current_mana -= skill.mana_cost;
+                        }
                     }
+                }else{
+                    println!("Skill on cd");
                 }
+                break;
             }
         }
     }
