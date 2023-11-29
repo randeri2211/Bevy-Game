@@ -130,13 +130,13 @@ pub fn player_input(
     }
 
     if keys.pressed(KeyCode::Space) {
-        // W is being held down
-        if player.last_speed < 0.0 && velocity.linvel.y >= 0.0 {
+        // Space is being held down
+        if player.last_speed.abs() <= 0.000001 && velocity.linvel.y <= 0.00001 && velocity.linvel.y >= 0.0 {
             // if the player just touched the ground or is currently touching it
             velocity.linvel.y = PLAYER_JUMP;
         }
-        player.last_speed = velocity.linvel.y
     }
+    player.last_speed = velocity.linvel.y;
 
     if keys.pressed(KeyCode::A) {
         // A is being held down
