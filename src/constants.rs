@@ -1,9 +1,10 @@
 
 // Global constants
 pub const PIXELS_PER_METERS: f32 = 32.0;
-pub const TILE_SIZE:f32 = 1.0/2.0; //Meters
-pub const TILES:i32 = 4;
-pub const NORMAL_FRICTION:f32 = 0.2;
+pub const TILE_SIZE: f32 = 1.0/2.0; //Meters
+pub const TILES: i32 = 4;
+pub const NORMAL_FRICTION: f32 = 0.2;
+pub const ZOOM: f32 = 0.5;
 
 // Skill constants
 pub const SKILL_CD: f32 = 1.0;
