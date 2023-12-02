@@ -16,15 +16,12 @@ struct BlockBundle{
 pub const BLOCK_IDS: [fn(
     &mut Commands,
     IVec3,
-    // asset_server: &Res<AssetServer>,
-    // &mut ResMut<Assets<Mesh>>,
-    // &mut ResMut<Assets<ColorMaterial>>,
     &mut TileMap
 )->Entity;
     4] = [
     grass,
-    grass,
-    grass,
+    rock,
+    interact,
     grass
 ];
 
@@ -33,17 +30,11 @@ pub const BLOCK_IDS: [fn(
 fn grass(
     commands: &mut Commands,
     position:IVec3,
-    // asset_server: &Res<AssetServer>,
-    // meshes:&mut ResMut<Assets<Mesh>>,
-    // materials:&mut ResMut<Assets<ColorMaterial>>,
     tilemap: &mut TileMap,
 )->Entity
 {
-    // let texture_handle:Handle<Image> = asset_server.load("grass.png");
-    // let mesh = Mesh::from(shape::Quad::default());
-    // let mesh_handle: Mesh2dHandle = meshes.add(mesh).into();
 
-    tilemap.set_tile(position, Some(Tile { sprite_index: 0, color: Color::WHITE ,..default()}));
+    tilemap.set_tile(position, Some(Tile { sprite_index: 1, color: Color::WHITE ,..default()}));
     commands
         .spawn(RigidBody::Fixed)
         .insert( BlockBundle{
@@ -60,83 +51,76 @@ fn grass(
         })
         .insert(ActiveCollisionTypes::all())
         .insert(ActiveEvents::COLLISION_EVENTS)
+        .insert(Restitution {
+            coefficient: 0.2,
+            combine_rule: CoefficientCombineRule::Multiply,
+        })
         .insert(Name::new("Grass"))
         .id()
-    // commands.spawn_empty().id()
 }
-//
-// fn rock(
-//     commands: &mut Commands,
-//     position:Vec3,
-//     asset_server: &Res<AssetServer>,
-//     meshes:&mut ResMut<Assets<Mesh>>,
-//     materials:&mut ResMut<Assets<ColorMaterial>>,
-//     tilemap: &mut TileMap,
-// )->Entity
-// {
-//     let texture_handle:Handle<Image> = asset_server.load("paneling.png");
-//     let mesh = Mesh::from(shape::Quad::default());
-//     let mesh_handle: Mesh2dHandle = meshes.add(mesh).into();
-//
-//     commands.spawn(RigidBody::Fixed)
-//         .insert(MaterialMesh2dBundle {
-//             mesh: mesh_handle,
-//             material: materials.add(ColorMaterial::from(texture_handle)),
-//             ..default()
-//         })
-//         .insert( BlockBundle{
-//             tile: MyTile {
-//                 id: 1,
-//             },
-//             collider: Collider::cuboid(TILE_SIZE, TILE_SIZE),
-//             friction: Friction{ coefficient: NORMAL_FRICTION * 2.0, combine_rule: CoefficientCombineRule::Multiply },
-//             transform: TransformBundle::from_transform(Transform {
-//                 translation: position,
-//                 scale: Vec3::splat(PIXELS_PER_METERS/2.0),
-//                 ..default()
-//             }),
-//         })
-//
-//         .insert(ActiveCollisionTypes::all())
-//         .insert(ActiveEvents::COLLISION_EVENTS)
-//         .id()
-// }
-//
-// fn interact(
-//     commands: &mut Commands,
-//     position:Vec3,
-//     asset_server: &Res<AssetServer>,
-//     meshes:&mut ResMut<Assets<Mesh>>,
-//     materials:&mut ResMut<Assets<ColorMaterial>>,
-//     tilemap: &mut TileMap,
-// )->Entity
-// {
-//     let texture_handle:Handle<Image> = asset_server.load("paneling_small.png");
-//     let mesh = Mesh::from(shape::Quad::default());
-//
-//     let mesh_handle: Mesh2dHandle = meshes.add(mesh).into();
-//
-//
-//     commands.spawn(RigidBody::Fixed)
-//         .insert(MaterialMesh2dBundle {
-//             mesh: mesh_handle,
-//             material: materials.add(ColorMaterial::from(texture_handle)),
-//             ..default()
-//         })
-//         .insert( BlockBundle{
-//             tile: MyTile {
-//                 id: 2,
-//             },
-//             collider:Collider::cuboid(TILE_SIZE, TILE_SIZE),
-//             friction: Friction{ coefficient: NORMAL_FRICTION, combine_rule: CoefficientCombineRule::Multiply },
-//             transform: TransformBundle::from_transform(Transform {
-//                 translation: Vec3::new(position.x,position.y - PIXELS_PER_METERS * TILE_SIZE / 4.0,position.z),
-//                 scale: Vec3::new(PIXELS_PER_METERS/2.0,PIXELS_PER_METERS/4.0,1.0),
-//                 ..default()
-//             }),
-//         })
-//
-//         .insert(ActiveCollisionTypes::all())
-//         .insert(ActiveEvents::COLLISION_EVENTS)
-//         .id()
-// }
+
+fn rock(
+    commands: &mut Commands,
+    position:IVec3,
+    tilemap: &mut TileMap,
+)->Entity
+{
+
+    tilemap.set_tile(position, Some(Tile { sprite_index: 0, color: Color::WHITE ,..default()}));
+
+    commands.spawn(RigidBody::Fixed)
+        .insert( BlockBundle{
+            tile: MyTile {
+                id: 1,
+            },
+            collider: Collider::cuboid(TILE_SIZE, TILE_SIZE),
+            friction: Friction{ coefficient: NORMAL_FRICTION * 2.0, combine_rule: CoefficientCombineRule::Multiply },
+            transform: TransformBundle::from_transform(Transform {
+                translation: position.as_vec3() * PIXELS_PER_METERS * TILE_SIZE,
+                scale: Vec3::splat(PIXELS_PER_METERS/2.0),
+                ..default()
+            }),
+        })
+        .insert(ActiveCollisionTypes::all())
+        .insert(ActiveEvents::COLLISION_EVENTS)
+        .insert(Restitution {
+            coefficient: 0.0,
+            combine_rule: CoefficientCombineRule::Multiply,
+        })
+        .insert(Name::new("Rock"))
+
+        .id()
+}
+
+fn interact(
+    commands: &mut Commands,
+    position:IVec3,
+    tilemap: &mut TileMap,
+)->Entity
+{
+
+    tilemap.set_tile(position, Some(Tile { sprite_index: 4, color: Color::WHITE ,..default()}));
+    commands.spawn(RigidBody::Fixed)
+        .insert( BlockBundle{
+            tile: MyTile {
+                id: 2,
+            },
+            collider:Collider::cuboid(TILE_SIZE, TILE_SIZE / 2.0),
+            friction: Friction{ coefficient: NORMAL_FRICTION, combine_rule: CoefficientCombineRule::Multiply },
+            transform: TransformBundle::from_transform(Transform {
+                translation: Vec3::new(position.x as f32 * PIXELS_PER_METERS * TILE_SIZE,
+                                       (position.y as f32 - 1.0 / 4.0) * PIXELS_PER_METERS * TILE_SIZE ,
+                                       position.z as f32),
+                scale: Vec3::splat(PIXELS_PER_METERS/2.0),
+                ..default()
+            }),
+        })
+        .insert(ActiveCollisionTypes::all())
+        .insert(ActiveEvents::COLLISION_EVENTS)
+        .insert(Restitution {
+            coefficient: 0.0,
+            combine_rule: CoefficientCombineRule::Multiply,
+        })
+        .insert(Name::new("Interact"))
+        .id()
+}

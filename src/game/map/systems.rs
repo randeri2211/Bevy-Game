@@ -21,10 +21,13 @@ pub fn load_map(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ){
     // new tilemap
+    let tiles_handle = asset_server.load("tilesheet.png");
+    let tiles_atlas = TextureAtlas::from_grid(tiles_handle, Vec2::new(16.0, 16.0), 5, 1, Some(Vec2::new(1.0, 1.0)), None);
+    let tiles_atlas_handle = texture_atlases.add(tiles_atlas);
 
-    let texture_handle = asset_server.load("tilesheet.png");
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 4, 1, Some(Vec2::new(1.0, 1.0)), None);
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+    let player_sheet = asset_server.load("New Piskel.png");
+    let player_atlas = TextureAtlas::from_grid(player_sheet, Vec2::new(15.0, 31.0), 1, 2, Some(Vec2::new(0.0, 1.0)), None);
+    let player_atlas_handle = texture_atlases.add(player_atlas);
 
     let mut tilemap = TileMap::default();
 
@@ -64,7 +67,7 @@ pub fn load_map(
                     &mut tilemap,
                 );
             }else if tile == 'x' {
-                tile_e = spawn_player(&mut commands,Vec3::new(position_x as f32 * PIXELS_PER_METERS * TILE_SIZE,position_y as f32 * PIXELS_PER_METERS * TILE_SIZE,0.0));
+                tile_e = spawn_player(&mut commands,Vec3::new(position_x as f32 * PIXELS_PER_METERS * TILE_SIZE,position_y as f32 * PIXELS_PER_METERS * TILE_SIZE,0.0),&player_atlas_handle);
             }
             tiles.push(tile_e);
             col += 1;
@@ -75,7 +78,7 @@ pub fn load_map(
     // Set up tilemap
     let tilemap_bundle = TileMapBundle {
         tilemap,
-        texture_atlas: texture_atlas_handle.clone(),
+        texture_atlas: tiles_atlas_handle.clone(),
         transform: Transform {
             scale: Vec3::splat(3.0),
             translation: Vec3::new(0.0, 0.0, 0.0),
@@ -106,7 +109,7 @@ pub fn cam_follow_player(
     c_transform.translation = p_transform.translation;
 }
 
-pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3)->Entity{
+pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3,spriteHandle:&Handle<TextureAtlas>)->Entity{
     // Skills init
     let mut player_skills:Vec<SkillBase> = Vec::new();
     player_skills.insert(0, SkillBase::default());
@@ -119,10 +122,15 @@ pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3)->Entity{
     // Player init
     commands
         .spawn(RigidBody::Dynamic)
-        .insert(Collider::capsule_y(TILE_SIZE / 2.0,TILE_SIZE / 2.0))
+        .insert(SpriteSheetBundle {
+            texture_atlas: spriteHandle.clone(),
+            sprite: TextureAtlasSprite::new(1),
+            ..default()
+        })
+        .insert(Collider::capsule_y(TILE_SIZE / 2.0 * PIXELS_PER_METERS,TILE_SIZE / 2.0 * PIXELS_PER_METERS))
         .insert(TransformBundle::from_transform(Transform {
             translation: translation_vec,
-            scale: Vec3::splat(PIXELS_PER_METERS),
+            scale: Vec3::splat(0.99),
             ..default()
         }))
         .insert(Restitution::coefficient(0.0))
@@ -131,6 +139,10 @@ pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3)->Entity{
             angvel: 0.0,
         })
         .insert(Friction {
+            coefficient: 1.0,
+            combine_rule: CoefficientCombineRule::Multiply,
+        })
+        .insert(Restitution {
             coefficient: 1.0,
             combine_rule: CoefficientCombineRule::Multiply,
         })

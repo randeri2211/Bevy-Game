@@ -16,7 +16,7 @@ impl Plugin for GamePlugin{
             .add_state::<GameState>()
             .add_plugins(MapPlugin{})
             .add_plugins(PlayerPlugin{})
-            .add_systems(Update, (block_collisions_handler,entity_collisions_handler).run_if(in_state(AppState::Game)))
+            .add_systems(Update, (block_collisions_handler,entity_collisions_handler).run_if(in_state(AppState::Game)).run_if(in_state(GameState::Running)))
         ;
     }
 }

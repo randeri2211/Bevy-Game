@@ -12,13 +12,13 @@ use crate::settings::components::Settings;
 
 pub fn player_input(
     keys: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Player,&mut Transform, &Collider,Entity,&mut Friction), With<Player>>,
+    mut query: Query<(&mut Velocity, &mut Player,&mut Transform, &Collider,Entity,&mut Friction,&mut TextureAtlasSprite)>,
     time: Res<Time>,
     mut collision_events: EventReader<CollisionEvent>,
     tile_collider_query: Query<(&Transform,&Collider,Entity),(With<MyTile>, Without<Player>)>,
-    settings: Res<Settings>
+    settings: Res<Settings>,
 ) {
-    let (mut velocity, mut player, mut player_transform, player_collider,player_entity,mut friction) = query.get_single_mut().unwrap().into();
+    let (mut velocity, mut player, mut player_transform, player_collider,player_entity,mut friction,mut player_sprite) = query.get_single_mut().unwrap().into();
     let mut x_pressed = false;
 
     // Used to reduce code duplication,rust compiler just chains it down as raw code to reduce run time(i think)
@@ -141,7 +141,7 @@ pub fn player_input(
     if keys.pressed(KeyCode::A) {
         // A is being held down
         x_pressed = true;
-
+        player_sprite.index = PLAYER_LEFT_ATLAS_INDEX;
         if velocity.linvel.x > -PLAYER_MAX_SPEED {
             velocity.linvel.x -= PLAYER_ACCELERATION * time.delta_seconds();
             if velocity.linvel.x < -PLAYER_MAX_SPEED {
@@ -151,14 +151,12 @@ pub fn player_input(
         if settings.auto_step{
             check_auto_step(&mut player_transform, &player_collider, player_entity, &mut collision_events, &tile_collider_query);
         }
-
-
     }
 
     if keys.pressed(KeyCode::D) {
         // D is being held down
         x_pressed = true;
-
+        player_sprite.index = PLAYER_RIGHT_ATLAS_INDEX;
         if velocity.linvel.x < PLAYER_MAX_SPEED {
             velocity.linvel.x += PLAYER_ACCELERATION * time.delta_seconds();
             if velocity.linvel.x > PLAYER_MAX_SPEED {
