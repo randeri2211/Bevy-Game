@@ -6,6 +6,7 @@ use bevy_rapier2d::rapier::prelude::CollisionEventFlags;
 use crate::AppState;
 use crate::constants::{PIXELS_PER_METERS, TILE_SIZE, ZOOM};
 use crate::game::entities::components::ManaBar;
+use crate::game::entities::player::components::Player;
 use crate::game::map::components::*;
 use crate::game::skills::skill_proj::*;
 
@@ -131,3 +132,4 @@ pub fn mana_regen(mut mages:Query<&mut ManaBar>,time:Res<Time>){
         mage.current_mana = f32::min(mage.current_mana + mage.mana_regen*time.delta_seconds(),mage.max_mana);
     }
 }
+

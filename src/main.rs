@@ -21,14 +21,14 @@ fn main() {
         // Given Plugins //
         .add_plugins(DefaultPlugins)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METERS))
-        .add_plugins(RapierDebugRenderPlugin::default())
+        // .add_plugins(RapierDebugRenderPlugin::default())
         // Player Plugin //
         .add_plugins(GamePlugin{})
         // System Plugins //
         .add_plugins(SettingsPlugin{})
         // FPS Counter Plugins //
-        // .add_plugins(LogDiagnosticsPlugin::default())
-        // .add_plugins(FrameTimeDiagnosticsPlugin::default())
+        .add_plugins(LogDiagnosticsPlugin::default())
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
         // .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(SimpleTileMapPlugin)
 
