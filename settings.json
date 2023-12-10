@@ -1,4 +1,5 @@
 {
   "master_volume": 100.0,
-  "auto_step": true
+  "auto_step": true,
+  "zoom": 0.5
 }

@@ -27,3 +27,11 @@ pub fn print_settings(settings: ResMut<Settings>){
     println!("{:?}",settings.into_inner());
 }
 
+pub fn update_zoom(
+    settings: ResMut<Settings>,
+    mut camera_query: Query<&mut Transform,With<Camera2d>>
+){
+    let mut camera_scale = camera_query.get_single_mut().unwrap();
+    camera_scale.scale.x = settings.zoom;
+    camera_scale.scale.y = settings.zoom;
+}

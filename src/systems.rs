@@ -4,17 +4,18 @@ use bevy::sprite::Mesh2dHandle;
 use bevy_rapier2d::prelude::*;
 use bevy_rapier2d::rapier::prelude::CollisionEventFlags;
 use crate::AppState;
-use crate::constants::{PIXELS_PER_METERS, TILE_SIZE, ZOOM};
+use crate::constants::*;
 use crate::game::entities::components::ManaBar;
-use crate::game::entities::player::components::Player;
 use crate::game::map::components::*;
 use crate::game::skills::skill_proj::*;
+use crate::settings::components::Settings;
 
 
-pub fn spawn_camera(mut commands: Commands) {
+pub fn spawn_camera(mut commands: Commands,
+                    settings: Res<Settings>) {
 
     commands.spawn(Camera2dBundle {
-        transform: Transform::from_xyz(0.0, 0.0, 0.0).with_scale(Vec3::splat(ZOOM)),
+        transform: Transform::from_xyz(0.0, 0.0, 0.0).with_scale(Vec3::splat(settings.zoom)),
         ..default()
     });
 }

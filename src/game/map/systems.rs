@@ -1,8 +1,10 @@
+use fs::write;
 use bevy_simple_tilemap::prelude::*;
 use std::fs;
 // use bevy_ecs_tilemap::prelude::*;
 // use bevy_simple_tilemap::prelude::*;
 use bevy::{prelude::*};
+use bevy::reflect::{TypeRegistry, TypeRegistryArc};
 use bevy_rapier2d::prelude::*;
 use bevy_rapier2d::prelude::ColliderMassProperties::Mass;
 use crate::block_id::BLOCK_IDS;
@@ -15,8 +17,6 @@ use crate::game::skills::skills::*;
 
 pub fn load_map(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ){
@@ -55,21 +55,18 @@ pub fn load_map(
         for tile in line.chars(){
             let position_x = -TILES / 2 + col;
             let position_y = - row ;
-            let mut tile_e:Entity = Entity::from_raw(0);
             if tile.is_digit(10) {
                 let index:usize = tile.to_digit(10).unwrap() as usize;
-                tile_e = BLOCK_IDS[index](
+                let tile_e = BLOCK_IDS[index](
                     &mut commands,
                     IVec3::new(position_x, position_y, 0),
-                    // &asset_server,
-                    // &mut meshes,
-                    // &mut materials,
                     &mut tilemap,
                 );
+                tiles.push(tile_e);
+
             }else if tile == 'x' {
-                tile_e = spawn_player(&mut commands,Vec3::new(position_x as f32 * PIXELS_PER_METERS * TILE_SIZE,position_y as f32 * PIXELS_PER_METERS * TILE_SIZE,0.0),&player_atlas_handle);
+                spawn_player(&mut commands,Vec3::new(position_x as f32 * PIXELS_PER_METERS * TILE_SIZE,position_y as f32 * PIXELS_PER_METERS * TILE_SIZE,0.0),&player_atlas_handle);
             }
-            tiles.push(tile_e);
             col += 1;
         }
         row += 1;
@@ -166,4 +163,18 @@ pub fn spawn_player(commands: &mut Commands, translation_vec:Vec3,spriteHandle:&
         })
         .insert(Name::new("Player"))
         .id()
+}
+
+
+pub fn save_scene(
+    keys: Res<Input<KeyCode>>,
+    world: &World,
+){
+    if keys.just_pressed(KeyCode::P){
+        let type_registery = world.resource::<AppTypeRegistry>();
+        let scene = DynamicScene::from_world(world);
+        let ron = scene.serialize_ron(type_registery);
+        
+        println!("{:?}",ron);
+    }
 }

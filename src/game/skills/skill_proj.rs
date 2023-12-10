@@ -1,15 +1,18 @@
 use bevy::math::*;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use serde::{Deserialize, Serialize};
 use crate::constants::*;
 
-#[derive(Component)]
+#[derive(Component,Reflect,Serialize,Deserialize,Default)]
+#[reflect(Component,Serialize,Deserialize)]
 pub struct SkillProjBase {
     pub(crate) id:u32,
     pub(crate) generation:u32,
 }
 
-#[derive(Component)]
+#[derive(Component,Reflect,Serialize,Deserialize,Default)]
+#[reflect(Component,Serialize,Deserialize)]
 pub struct SkillProj {
 }
 

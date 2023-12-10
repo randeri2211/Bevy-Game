@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::sprite::*;
 use bevy_rapier2d::prelude::*;
 use bevy_simple_tilemap::prelude::*;
 use crate::constants::*;
